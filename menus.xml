@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- $Id$ -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	   default-lazy-init="true">
+
+	<!-- renders the top-right menu -->
+	<bean id="topMenuRenderer" class="com.intland.codebeamer.ui.view.TopMenuRenderer">
+		<property name="styleClass" value="mainmenu" />
+		<property name="actionItems">
+			<list>
+				<bean class="com.intland.codebeamer.ui.view.TopMenuActionItem">
+					<property name="label" value="History"/>
+					<property name="url" value="/history.spr"/>
+					<property name="openInPopup" value="true"/>
+					<property name="properties">
+						<map>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+
+				<bean class="com.intland.codebeamer.ui.view.TopMenuActionItem">
+					<property name="useRequestUriAsLoginTarget" value="true"/>
+					<property name="label" value="Login" />
+					<property name="url" value="/login.spr" />
+					<property name="properties">
+						<map>
+							<entry key="permissions" value="~"/>
+						</map>
+					</property>
+				</bean>
+
+				<bean class="com.intland.codebeamer.ui.view.TopMenuActionItem">
+					<property name="useRequestUriAsLoginTarget" value="true"/>
+					<property name="label" value="Logout"/>
+					<property name="url" value="/logout.spr"/>
+					<property name="properties">
+						<map>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="abstractToolMenuRendererTemplate" abstract="true"
+				class="com.intland.codebeamer.ui.view.ToolMenuRenderer">
+			<!--
+				<property name="abbreviateLength" value="40"/>
+			-->
+	</bean>
+
+<!--
+	<bean id="currentProjectTabFactory" class="com.intland.codebeamer.ui.view.CurrentProjectTabFactory" scope="request"/>
+-->
+
+	<!-- renders the toolbar -->
+	<bean id="toolMenuRenderer" parent="abstractToolMenuRendererTemplate" scope="request">
+		<property name="actionItems">
+			<list>
+				<bean id="login" class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>login</value></property>
+					<property name="label"><value>Login</value></property>
+					<property name="url"><value>/login.spr</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_workspace_selected"/>
+							<entry key="permissions" value="~"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>mystart</value></property>
+					<property name="label"><value>My Start</value></property>
+					<property name="url"><value>/user</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_workspace_selected"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>project_browser</value></property>
+					<property name="label"><value>Projects</value></property>
+					<property name="url"><value>${projectList.url}</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_workspace_selected"/>
+							<!-- Activate it if it should appear only for signed in accounts.
+							<entry key="permissions" value="#"/>
+							-->
+						</map>
+					</property>
+				</bean>
+
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>queries</value></property>
+					<property name="label"><value>Queries</value></property>
+					<property name="url"><value>/query</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_queries_selected"/>
+							<entry key="permissions" value="queries_view"/>
+						</map>
+					</property>
+				</bean>
+
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>review</value></property>
+					<property name="label"><value>Review Hub</value></property>
+					<property name="url"><value>/review</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_review_selected"/>
+							<entry key="permissions" value="review"/>
+						</map>
+					</property>
+				</bean>
+
+				<!-- the current-project tab is different for every request as the project changes
+					 so creating it using a factory
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem" scope="request"
+						factory-bean="currentProjectTabFactory" factory-method="createCurrentProjectTab" />
+				-->
+
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>wikispace</value></property>
+					<property name="label"><value>Wiki</value></property>
+					<property name="url"><value>${project.urlLink}?revision=${baseline.id}</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_wikispace_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="wiki_space_view"/>
+							<entry key="remember" value="false"/>
+						</map>
+					</property>
+				</bean>
+
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>docs</value></property>
+					<property name="label"><value>Documents</value></property>
+					<property name="url"><value>${project.urlLink}/documents?revision=${baseline.id}&amp;doc_id=${baseline.id}</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_docs_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="document_view"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>tracker</value></property>
+					<property name="label"><value>Trackers</value></property>
+					<property name="url"><value>${project.urlLink}/tracker?revision=${baseline.id}</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_tracker_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="tracker_view, cmdb_view"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>sources</value></property>
+					<property name="label"><value>SCM Repository</value></property>
+					<property name="url"><value>${project.urlLink}/repositories?revision=${baseline.id}</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_sources_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="scm_view"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>baselines</value></property>
+					<property name="label"><value>Baselines</value></property>
+					<property name="url"><value>${project.urlLink}/baselines</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_docs_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="baseline_view"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>members</value></property>
+					<property name="label"><value>Members</value></property>
+					<property name="url"><value>${project.urlLink}/members</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_members_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="members_view"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>labels</value></property>
+					<property name="label"><value>Tags</value></property>
+					<property name="url"><value>/proj/tag/showTags.spr</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_labels_selected"/>
+							<entry key="requiresProject" value="false"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>admin</value></property>
+					<property name="label"><value>Admin</value></property>
+					<property name="url"><value>${project.urlLink}/admin</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_admin_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="project_admin"/>
+							<entry key="remember" value="true"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>trash</value></property>
+					<property name="label"><value>Trash</value></property>
+					<property name="url"><value>${project.urlLink}/trash</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_trash_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>userGroups</value></property>
+					<property name="label"><value>User groups</value></property>
+					<property name="url"><value>/sysadmin/userGroups.spr</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_labels_selected"/>
+							<entry key="requiresProject" value="false"/>
+							<entry key="permissions" value="account_role_view"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>sysadmin</value></property>
+					<property name="label"><value>System Admin</value></property>
+					<property name="url"><value>/sysadmin.spr</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_sysadmin_selected"/>
+							<entry key="requiresProject" value="false"/>
+							<entry key="permissions" value="system_admin"/>
+						</map>
+					</property>
+				</bean>
+				
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id" value="custom"/>
+					<property name="label" value="My Tab"/>
+					<property name="url" value="/custom/mypage.jsp?proj_id=${project.id}" />
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_custom_selected"/>
+							<entry key="requiresProject" value="false"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+					<property name="children">
+						<list>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="codebeamer.com"/>
+								<property name="label" value="Codebeamer home"/>
+								<property name="url" value="https://codebeamer.com"/>
+							</bean>
+						</list>
+					</property>
+				</bean>
+				
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id" value="custom"/>
+					<property name="label" value="연관 시스템"/>
+					<property name="url" value="/custom/mypage.jsp?proj_id=${project.id}" />
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_custom_selected"/>
+							<entry key="requiresProject" value="false"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+
+					<property name="children">
+						<list>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="redmine"/>
+								<property name="label" value="Trionnet's redmine"/>
+								<property name="url" value="http://trionnet.synology.me:3333/"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="gitea"/>
+								<property name="label" value="Trionnet's gitea"/>
+								<property name="url" value="http://trionnet.synology.me:3335/"/>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="jenkin"/>
+								<property name="label" value="Trionnet's jenkins"/>
+								<property name="url" value="http://trionnet.synology.me:3334/"/>								
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="코드 비머"/>
+								<property name="label" value="Codebeamer home"/>
+								<property name="url" value="https://codebeamer.com"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="blog.trionnet.com"/>
+								<property name="label" value="Trionnet's blog"/>
+								<property name="url" value="https://blog.naver.com/trionnet"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="trionnet.com"/>
+								<property name="label" value="Trionnet's homepage"/>
+								<property name="url" value="http://trionnet.com"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="ptc.com"/>
+								<property name="label" value="PTC home"/>
+								<property name="url" value="http://www.ptc.com"/>
+								<property name="children">
+							</bean>
+							<!--
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="more"/>
+								<property name="label" value="more..."/>
+								<property name="url" value="#"/>
+								<property name="children">
+									<list>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="evenmore"/>
+											<property name="label" value="even more..."/>
+											<property name="url" value="#"/>
+											<property name="children">
+												<list>
+													<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+														<property name="id" value="first"/>
+														<property name="label" value="first"/>
+														<property name="url" value="#"/>
+														<property name="onClick"><value>alert('first is clicked!'); return false;</value></property>
+													</bean>
+													<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+														<property name="id" value="second"/>
+														<property name="label" value="second"/>
+														<property name="url" value="#"/>
+														<property name="onClick"><value>alert('second is clicked!'); return false;</value></property>
+													</bean>
+												</list>
+											</property>
+										</bean>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="gmail"/>
+											<property name="label" value="Gmail"/>
+											<property name="url" value="http://www.gmail.com"/>
+										</bean>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="facebook"/>
+											<property name="label" value="Facebook"/>
+											<property name="url" value="http://www.facebook.com"/>
+										</bean>
+									</list>
+								</property>
+							</bean>
+
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="dynamic"/>
+								<property name="label" value="dynamic menus"/>
+								<property name="url" value="#"/>
+								<property name="childMenuBuilder">
+									<bean class="com.intland.codebeamer.custom.DynamicActionMenuBuilder"/>
+								</property>
+							</bean>
+							-->
+						</list>
+					</property>
+				</bean>
+				
+				<!-- Demo for defining new deep menus, with static or dynamic content-->
+				<!--
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id" value="custom"/>
+					<property name="label" value="My Tab"/>
+					<property name="url" value="/custom/mypage.jsp?proj_id=${project.id}" />
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_custom_selected"/>
+							<entry key="requiresProject" value="true"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+
+					<property name="children">
+						<list>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="codebeamer.com"/>
+								<property name="label" value="Codebeamer home"/>
+								<property name="url" value="https://codebeamer.com"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="intland.com"/>
+								<property name="label" value="Intland home"/>
+								<property name="url" value="https://intland.com"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="blog.intland.com"/>
+								<property name="label" value="Intland's blog"/>
+								<property name="url" value="http://blog.intland.com"/>
+							</bean>
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="javaforge.com"/>
+								<property name="label" value="JavaForge home"/>
+								<property name="url" value="http://www.javaforge.com"/>
+							</bean>
+
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="more"/>
+								<property name="label" value="more..."/>
+								<property name="url" value="#"/>
+								<property name="children">
+									<list>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="evenmore"/>
+											<property name="label" value="even more..."/>
+											<property name="url" value="#"/>
+											<property name="children">
+												<list>
+													<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+														<property name="id" value="first"/>
+														<property name="label" value="first"/>
+														<property name="url" value="#"/>
+														<property name="onClick"><value>alert('first is clicked!'); return false;</value></property>
+													</bean>
+													<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+														<property name="id" value="second"/>
+														<property name="label" value="second"/>
+														<property name="url" value="#"/>
+														<property name="onClick"><value>alert('second is clicked!'); return false;</value></property>
+													</bean>
+												</list>
+											</property>
+										</bean>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="gmail"/>
+											<property name="label" value="Gmail"/>
+											<property name="url" value="http://www.gmail.com"/>
+										</bean>
+										<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+											<property name="id" value="facebook"/>
+											<property name="label" value="Facebook"/>
+											<property name="url" value="http://www.facebook.com"/>
+										</bean>
+									</list>
+								</property>
+							</bean>
+
+							<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+								<property name="id" value="dynamic"/>
+								<property name="label" value="dynamic menus"/>
+								<property name="url" value="#"/>
+								<property name="childMenuBuilder">
+									<bean class="com.intland.codebeamer.custom.DynamicActionMenuBuilder"/>
+								</property>
+							</bean>
+						</list>
+					</property>
+				</bean>
+				-->
+			</list>
+		</property>
+	</bean>
+
+	<!-- renders the generate License toolbar -->
+	<bean id="licenseMenuRenderer" parent="abstractToolMenuRendererTemplate">
+		<property name="actionItems">
+			<list>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>mystart</value></property>
+					<property name="label"><value>My Start</value></property>
+					<property name="url"><value>/user</value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_workspace_selected"/>
+							<entry key="permissions" value="#"/>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.intland.codebeamer.taglib.actionmenu.model.ActionItem">
+					<property name="id"><value>license</value></property>
+					<property name="label"><value>License</value></property>
+					<property name="url"><value></value></property>
+					<property name="properties">
+						<map>
+							<entry key="selectionStyle" value="toolbar_sysadmin_selected" />
+							<entry key="requiresProject" value="false" />
+							<entry key="permissions" value="#" />
+						</map>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>
